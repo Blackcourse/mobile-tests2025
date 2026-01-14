@@ -1,20 +1,72 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'io.qameta.allure' version '2.11.2'
 }
+def allureVersion = "2.21.0",
+    selenideVersion = "7.13.0",
+        restAssuredVersion = "5.3.1",
+        aspectjWeaverVersion = "1.9.22"
 
-group = 'org.example'
-version = '1.0-SNAPSHOT'
+allure {
+    report {
+        version.set(allureVersion) //версия Allure Report (https://github.com/allure-framework/allure2)
+    }
+    adapter {
+        aspectjWeaver.set(true) // обработка аннотации @Step
+        frameworks {
+            junit5 {
+                adapterVersion.set(allureVersion) //версия Allure JUnit5 (https://github.com/allure-framework/allure-java)
+            }
+        }
+    }
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation(
+            "com.codeborne:selenide:$selenideVersion",
+            "io.rest-assured:rest-assured:$restAssuredVersion",
+            "io.rest-assured:json-schema-validator:$restAssuredVersion",
+            "com.github.javafaker:javafaker:1.0.2",
+            "org.junit.jupiter:junit-jupiter:5.10.0",
+            'org.slf4j:slf4j-simple:2.0.7',
+            "com.codeborne:pdf-test:1.8.1",
+            "com.codeborne:pdf-test:2.1.0",
+            "com.codeborne:xls-test:1.7.2",
+            "org.apache.poi:poi:5.2.4",
+            "com.opencsv:opencsv:5.12.0",
+            "org.junit.jupiter:junit-jupiter",
+            "tools.jackson.core:jackson-core:3.0.0",
+            "tools.jackson.core:jackson-databind:3.0.0",
+            "com.fasterxml.jackson.core:jackson-annotations:2.20",
+            "org.assertj:assertj-core:3.26.0",
+            "org.apache.poi:poi-ooxml:5.4.0",
+            "io.qameta.allure:allure-selenide:$allureVersion",
+            "io.appium:java-client:10.0.0",
+            "org.aspectj:aspectjweaver:$aspectjWeaverVersion",
+            "org.aeonbits.owner:owner:1.0.12"
+
+    )
 }
 
-test {
+tasks.withType(Test) {
     useJUnitPlatform()
+    systemProperties(System.getProperties())
+    testLogging {
+        lifecycle {
+            events "started", "skipped", "failed", "standard_error", "standard_out"
+            exceptionFormat "short"
+        }
+    }
 }
+
+task single_property_test(type: Test) {
+    useJUnitPlatform() {
+        includeTags("singlePropertyTest")
+    }
+}
+
+
