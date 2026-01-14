@@ -10,6 +10,8 @@ import org.aeonbits.owner.ConfigFactory;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
 import javax.annotation.Nonnull;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,7 +43,7 @@ public class BrowserstackDriver implements WebDriverProvider {
 
             if (platform.equals("android")) {
                 MutableCapabilities options = settingsForAndroid(caps);
-                return new AndroidDriver(new URL(HUB_URL), options);
+                return new RemoteWebDriver(new URL(HUB_URL), options);
             }
 
        /*     if (platform.equals("ios")) {
