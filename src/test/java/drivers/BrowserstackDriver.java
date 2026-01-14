@@ -8,6 +8,7 @@ import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.options.XCUITestOptions;
 import org.aeonbits.owner.ConfigFactory;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import javax.annotation.Nonnull;
 import java.net.MalformedURLException;
@@ -28,28 +29,25 @@ public class BrowserstackDriver implements WebDriverProvider {
                 MobileConfig.class, System.getProperties()
         );
 
-        Map<String, Object> bstackOptions = new HashMap<>();
-        bstackOptions.put("userName", config.browserstackUser());
-        bstackOptions.put("accessKey",config.browserstackKey());
+        MutableCapabilities caps = new MutableCapabilities();
+        caps.setCapability("browserstack.user", config.browserstackUser());
+        caps.setCapability("browserstack.key", config.browserstackKey());
 
-        bstackOptions.put("deviceName", config.device());
-        bstackOptions.put("osVersion", config.os_version());
-        bstackOptions.put("projectName", "Run tests on" + config.device());
-        bstackOptions.put("buildName", "build-for-" + config.device() + config.platform());
-        bstackOptions.put("sessionName", "tests");
+        caps.setCapability("device", config.device());
+        caps.setCapability("osVersion", config.os_version());
 
         try {
             String platform = config.platform().toLowerCase();
 
             if (platform.equals("android")) {
-                UiAutomator2Options options = settingsForAndroid(bstackOptions);
+                MutableCapabilities options = settingsForAndroid(caps);
                 return new AndroidDriver(new URL(HUB_URL), options);
             }
 
-            if (platform.equals("ios")) {
-                XCUITestOptions options = settingsForIos(bstackOptions);
+       /*     if (platform.equals("ios")) {
+                XCUITestOptions options = settingsForIos(caps);
                 return new IOSDriver(new URL(HUB_URL), options);
-            }
+            }*/
 
             throw new IllegalArgumentException("Unknown platform: " + config.platform());
 
@@ -58,18 +56,18 @@ public class BrowserstackDriver implements WebDriverProvider {
         }
     }
 
-    UiAutomator2Options settingsForAndroid(Map<String, Object> bstackOptions) {
-        UiAutomator2Options options = new UiAutomator2Options();
-        options.setCapability("platformName", "android");
-        options.setCapability("app", "bs://sample.app");
-        options.setCapability("appium:automationName", "UiAutomator2");
-        options.setCapability("bstack:options", bstackOptions);
-        return options;
+    MutableCapabilities settingsForAndroid(MutableCapabilities caps) {
+      //  UiAutomator2Options options = new UiAutomator2Options();
+      //  options.setCapability("platformName", "android");
+        caps.setCapability("app", "bs://sample.app");
+        caps.setCapability("appium:automationName", "UiAutomator2");
+      //  caps.setCapability("bstack:options", bstackOptions);
+        return caps;
     }
 
     XCUITestOptions settingsForIos(Map<String, Object> bstackOptions) {
         XCUITestOptions options = new XCUITestOptions();
-        options.setCapability("platformName", "ios");
+      //  options.setCapability("platformName", "ios");
         options.setCapability("app", "bs://sample.app");
         options.setCapability("appium:automationName", "XCUITest");
         options.setCapability("bstack:options", bstackOptions);
